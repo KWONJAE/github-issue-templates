@@ -1,0 +1,80 @@
+name: Release old version
+
+on:
+  workflow_dispatch:
+    branches:
+      - '*.x'
+    branches-ignore:
+      - 'develop'
+      - 'main'
+      - 'feature/**'
+    inputs:
+      version:
+        description: Version you want to release. It must follow semver eg "6.0.0"
+        required: true
+      phase:
+        type: choice
+        required: true
+        description: Select build phase to deploy.
+        options:
+          - alpha
+          - beta
+          - release
+
+jobs:
+    set-variables:
+        runs-on: ubuntu-18
+        steps:
+          - name: Checkout Repo
+            uses: gfp-actions/checkout@v3
+          - name: Get Version Number
+            id: get-version-number
+            if: ${{ inputs.phase }} != 'release'
+            run: |
+              local lastTag=$(git tag -l --sort=refname "v${INPUT_VERSION}-${INPUT_PHASE}.*" | tail -1)
+              echo "Last tag is \"${lastTag}\""
+              if [ -z "${lastTag}" ]; then
+                NEXT_VERSION="${INPUT_VERSION}-${INPUT_PHASE}.1"
+              else
+                if [[ "${lastTag}" =~ ^v${INPUT_VERSION}-${INPUT_PHASE}.(0|[1-9][0-9]*)$ ]]; then
+                  number=$((BASH_REMATCH[1]))
+                  NEXT_VERSION="${INPUT_VERSION}-${INPUT_PHASE}.$((++number))"
+                  echo "version_number=${number}"
+                  echo "version_number=${number}" >> $GITHUB_OUTPUT
+                else
+                  echo "Last tag is unsupported tag."
+                fi
+              fi
+              echo "Next version is ${NEXT_VERSION}"
+          - name: Get Release Version
+            id: get-version
+            run: |
+              if [ ${INPUT_PHASE} -eq 'release' ]; then
+                echo "release_version=${INPUT_VERSION}"
+                echo "release_version=${INPUT_VERSION}" >> $GITHUB_OUTPUT
+              else
+                echo "release_version=${INPUT_VERSION}-${INPUT_PHASE}.${env.version_number}"
+                echo "release_version=${INPUT_VERSION}-${INPUT_PHASE}.${env.version_number}" >> $GITHUB_OUTPUT
+              fi
+        outputs:
+            release_version: ${{ steps.get-version.outputs.release_version }}
+
+    release-please:
+        runs-on: ubuntu-18
+        needs: [set-variables]
+        if: ${{ needs.set-variables.outputs.release_version != '' }}
+        steps:
+            - name: Release Please
+              uses: gfp-actions/release-please-action@v1
+              id: release
+              with:
+                  release-type: simple
+                  default-branch: ${{ github.ref_name }}
+                  pull-request-title-pattern: 'chore: release ${version}'
+                  changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"refactor","section":"Code Refactoring","hidden":false}]'
+                  extra-files: gradle.properties
+                  prerelease: true
+                  release-as: ${{ needs.set-variables.outputs.release_version }}
+        outputs:
+            release_created: ${{ steps.release.outputs.release_created }}
+            body: ${{ steps.release.outputs.body }}
