@@ -45,7 +45,7 @@ jobs:
           - name: Get Release Version
             id: get-version
             run: |
-              if [ "${{ inputs.phase }}" -eq "release" ]; then
+              if [ "${{ inputs.phase }}" = "release" ]; then
                 echo "release_version=${{ inputs.version }}"
                 echo "release_version=${{ inputs.version }}" >> $GITHUB_OUTPUT
               else
@@ -69,7 +69,7 @@ jobs:
                   pull-request-title-pattern: 'chore: release ${version}'
                   changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"refactor","section":"Code Refactoring","hidden":false}]'
                   extra-files: gradle.properties
-                  prerelease: ${{ inputs.phase }} != 'release'
+                  prerelease: ${{ inputs.phase != 'release' }}
                   release-as: ${{ needs.set-variables.outputs.release_version }}
         outputs:
             release_created: ${{ steps.release.outputs.release_created }}
