@@ -47,8 +47,8 @@ jobs:
                 echo "release_version=${{ inputs.version }}"
                 echo "release_version=${{ inputs.version }}" >> $GITHUB_OUTPUT
               else
-                echo "release_version=${{ inputs.version }}-${{ inputs.phase }}.${env.version_number}"
-                echo "release_version=${{ inputs.version }}-${{ inputs.phase }}.${env.version_number}" >> $GITHUB_OUTPUT
+                echo "release_version=${{ inputs.version }}-${{ inputs.phase }}.${{ steps.get-version-number.outputs.version_number}}"
+                echo "release_version=${{ inputs.version }}-${{ inputs.phase }}.${{ steps.get-version-number.outputs.version_number}}" >> $GITHUB_OUTPUT
               fi
         outputs:
             release_version: ${{ steps.get-version.outputs.release_version }}
