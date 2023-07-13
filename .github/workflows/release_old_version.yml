@@ -45,7 +45,7 @@ jobs:
           - name: Get Release Version
             id: get-version
             run: |
-              if [ '${{ inputs.phase }}' -eq 'release' ]; then
+              if [ "${{ inputs.phase }}" -eq "release" ]; then
                 echo "release_version=${{ inputs.version }}"
                 echo "release_version=${{ inputs.version }}" >> $GITHUB_OUTPUT
               else
@@ -61,7 +61,7 @@ jobs:
         if: ${{ needs.set-variables.outputs.release_version != '' }}
         steps:
             - name: Release Please
-              uses: google-github-actions/release-please-action@v1
+              uses: google-github-actions/release-please-action@v3
               id: release
               with:
                   release-type: simple
