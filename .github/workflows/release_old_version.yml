@@ -25,7 +25,7 @@ jobs:
             id: get-version-number
             if: ${{ inputs.phase }} != 'release'
             run: |
-              local lastTag=$(git tag -l --sort=refname "v${INPUT_VERSION}-${INPUT_PHASE}.*" | tail -1)
+              lastTag=$(git tag -l --sort=refname "v${INPUT_VERSION}-${INPUT_PHASE}.*" | tail -1)
               echo "Last tag is \"${lastTag}\""
               if [ -z "${lastTag}" ]; then
                 NEXT_VERSION="${INPUT_VERSION}-${INPUT_PHASE}.1"
