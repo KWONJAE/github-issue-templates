@@ -20,7 +20,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Checkout Repo
-            uses: gfp-actions/checkout@v3
+            uses: actions/checkout@v3
           - name: Get Version Number
             id: get-version-number
             if: ${{ inputs.phase }} != 'release'
@@ -59,7 +59,7 @@ jobs:
         if: ${{ needs.set-variables.outputs.release_version != '' }}
         steps:
             - name: Release Please
-              uses: gfp-actions/release-please-action@v1
+              uses: google-github-actions/release-please-action@v2
               id: release
               with:
                   release-type: simple
