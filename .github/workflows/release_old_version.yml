@@ -23,10 +23,10 @@ on:
 
 jobs:
   set-variables:
-    runs-on: ubuntu-18
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: gfp-actions/checkout@v3
+        uses: actions/checkout@v3
       - name: Get Version Number
         id: get-version-number
         if: ${{ inputs.phase != 'release' }}
@@ -68,12 +68,12 @@ jobs:
       release_version: ${{ steps.get-version.outputs.release_version }}
 
   release-please:
-    runs-on: ubuntu-18
+    runs-on: ubuntu-latest
     needs: [set-variables]
     if: ${{ needs.set-variables.outputs.release_version != '' }}
     steps:
       - name: Release Please
-        uses: gfp-actions/release-please-action@v1
+        uses: google-github-actions/release-please-action@v3
         id: release
         with:
           release-type: simple
@@ -88,16 +88,11 @@ jobs:
       body: ${{ steps.release.outputs.body }}
   
   publish:
-    runs-on: ubuntu-18
+    runs-on: ubuntu-latest
     needs: [ release-please ]
     if: ${{ needs.release-please.outputs.release_created }}
     steps:
       - name: Checkout Repo
-        uses: gfp-actions/checkout@v3
-      - name: Set up JDK 11
-        uses: gfp-actions/setup-java@v3
-        with:
-          java-version: 11
-          distribution: adopt
+        uses: actions/checkout@v3
       - name: Publish All (internalDebug, internalRelease, externalRelease)
         run: ls -al ./*
