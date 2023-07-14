@@ -58,8 +58,10 @@ jobs:
             fi
           fi
           echo "Next version is ${NEXT_VERSION}"
-          echo "version_number=${versionNumber}"
-          echo "version_number=${versionNumber}" >> $GITHUB_OUTPUT
+          if [ ! -z "${NEXT_VERSION}" ]; then
+            echo "version_number=${versionNumber}"
+            echo "version_number=${versionNumber}" >> $GITHUB_OUTPUT
+          fi
       - name: Get Release Version
         id: get-version
         if: ${{ steps.get-version-number.outputs.version_number != '' }}
