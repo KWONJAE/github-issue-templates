@@ -1,6 +1,9 @@
 name: Release old version
 
 on:
+  push:
+    branches:
+      - '*.x'
   workflow_dispatch:
     inputs:
       version:
