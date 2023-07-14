@@ -2,12 +2,6 @@ name: Release old version
 
 on:
   workflow_dispatch:
-    branches:
-      - '*.x'
-    branches-ignore:
-      - 'develop'
-      - 'main'
-      - 'feature/**'
     inputs:
       version:
         description: Version you want to release. It must follow semver eg "6.0.0"
@@ -27,6 +21,13 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+      - name: Check Branch
+        run: |
+          filteroutlist=("develop" "main" "master")
+          if [[ ${filteroutlist[*]} =~ "${{ github.ref_name }}" ]]; then
+            echo "Can not do this workflow with this branch(${{ github.ref_name }})"
+            exit 1
+          fi
       - name: Get Version Number
         id: get-version-number
         if: ${{ inputs.phase != 'release' }}
