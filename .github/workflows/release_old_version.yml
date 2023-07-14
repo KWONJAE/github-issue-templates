@@ -33,7 +33,6 @@ jobs:
           fi
       - name: Get Release Version
         id: get-version
-        if: ${{ inputs.phase != 'release' }}
         run: |
           LAST_COMMIT_MESSAGE=$(git log --format=%s -n 1)
           echo "Last commit message is \"${LAST_COMMIT_MESSAGE}\""
