@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.1-release.1](https://github.com/KWONJAE/github-issue-templates/compare/v4.0.1-beta.1...v4.0.1-release.1) (2023-07-14)
+
+
+### Bug Fixes
+
+* Update release_old_version.yml ([3001447](https://github.com/KWONJAE/github-issue-templates/commit/30014471f8deec26e162a6217a95629e0b5003b0))
+* Update release_old_version.yml ([25cf5d6](https://github.com/KWONJAE/github-issue-templates/commit/25cf5d64afd8be324f68c52f0f1064b235a4f5ee))
+
 ## 4.0.1-beta.1 (2023-07-14)
 
 
