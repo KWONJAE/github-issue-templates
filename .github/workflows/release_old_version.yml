@@ -45,15 +45,19 @@ jobs:
             lastTag=$(git tag -l --sort=refname "v${{ inputs.version }}-${{ inputs.phase }}.*" | tail -1)
             versionNumber=1
             echo "Last tag is \"${lastTag}\""
-            if [ -z "${lastTag}" ]; then
+            if [ -z "${lastTag}" -a "${{ inputs.phase }}" = "release" ]; then
+              NEXT_VERSION="${{ inputs.version }}"
+            elif [ -z "${lastTag}" -a "${{ inputs.phase }}" != "release"  ]; then
               NEXT_VERSION="${{ inputs.version }}-${{ inputs.phase }}.${versionNumber}"
-            else
+            elif [ ! -z "${lastTag}" -a "${{ inputs.phase }}" != "release"  ]; then
               if [[ "${lastTag}" =~ ^v${{ inputs.version }}-${{ inputs.phase }}.(0|[1-9][0-9]*)$ ]]; then
                 versionNumber=$((BASH_REMATCH[1]))
                 NEXT_VERSION="${{ inputs.version }}-${{ inputs.phase }}.$((++versionNumber))"
               else
                 echo "Last tag is unsupported tag."
               fi
+            else
+              echo "Does not support inputs version: ${{ inputs.version }} phase: ${{ inputs.phase }}"
             fi
           fi
           echo "Next version is ${NEXT_VERSION}"
