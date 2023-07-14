@@ -68,6 +68,7 @@ jobs:
             echo "release_version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
           fi
       - name: Check Release Version To Publish
+        if: ${{ steps.get-version.outputs.release_version != '' }}
         run: |
           if git show-ref --tags --verify --quiet "refs/tags/${{ steps.get-version.outputs.release_version }}"; then
             echo "Already exist tag ${{ steps.get-version.outputs.release_version }}"
