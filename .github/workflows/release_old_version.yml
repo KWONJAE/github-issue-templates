@@ -62,6 +62,7 @@ jobs:
           echo "version_number=${versionNumber}" >> $GITHUB_OUTPUT
       - name: Get Release Version
         id: get-version
+        if: ${{ steps.get-version-number.outputs.version_number != '' }}
         run: |
           if [ '${{ inputs.phase }}' = 'release' ]; then
             echo "release_version=${{ inputs.version }}"
