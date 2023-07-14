@@ -2,6 +2,12 @@ name: Release old version
 
 on:
   workflow_dispatch:
+    branches:
+      - '*.x'
+    branches-ignore:
+      - 'develop'
+      - 'main'
+      - 'feature/**'
     inputs:
       version:
         description: Version you want to release. It must follow semver eg "6.0.0"
