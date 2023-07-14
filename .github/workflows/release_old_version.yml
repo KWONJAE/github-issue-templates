@@ -31,8 +31,8 @@ jobs:
             echo "Can not do this workflow with this branch(${{ github.ref_name }})"
             exit 1
           fi
-      - name: Get Version Number
-        id: get-version-number
+      - name: Get Release Version
+        id: get-version
         if: ${{ inputs.phase != 'release' }}
         run: |
           LAST_COMMIT_MESSAGE=$(git log --format=%s -n 1)
@@ -41,14 +41,14 @@ jobs:
           if [[ "${LAST_COMMIT_MESSAGE}" =~ ^chore:[[:space:]]release[[:space:]](.+)$ ]]; then
             echo "Try to get next version from last commit"
             NEXT_VERSION=${BASH_REMATCH[1]}
-          else
-            echo "Try to get next version from input and tag"
+          elif [ ! -z "${{ inputs.version }}" ]; then
+            echo "Try to get next version from inputs and tag"
             lastTag=$(git tag -l --sort=refname "v${{ inputs.version }}-${{ inputs.phase }}.*" | tail -1)
             versionNumber=1
             echo "Last tag is \"${lastTag}\""
-            if [ -z "${lastTag}" -a ! -z "${{ inputs.version }}" ]; then
+            if [ -z "${lastTag}" ]; then
               NEXT_VERSION="${{ inputs.version }}-${{ inputs.phase }}.${versionNumber}"
-            elif [ ! -z "${{ inputs.version }}" ]; then
+            else
               if [[ "${lastTag}" =~ ^v${{ inputs.version }}-${{ inputs.phase }}.(0|[1-9][0-9]*)$ ]]; then
                 versionNumber=$((BASH_REMATCH[1]))
                 NEXT_VERSION="${{ inputs.version }}-${{ inputs.phase }}.$((++versionNumber))"
@@ -59,21 +59,10 @@ jobs:
           fi
           echo "Next version is ${NEXT_VERSION}"
           if [ ! -z "${NEXT_VERSION}" ]; then
-            echo "version_number=${versionNumber}"
-            echo "version_number=${versionNumber}" >> $GITHUB_OUTPUT
+            echo "release_version=${NEXT_VERSION}"
+            echo "release_version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
           fi
-      - name: Get Release Version
-        id: get-version
-        if: ${{ steps.get-version-number.outputs.version_number != '' }}
-        run: |
-          if [ '${{ inputs.phase }}' = 'release' ]; then
-            echo "release_version=${{ inputs.version }}"
-            echo "release_version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "release_version=${{ inputs.version }}-${{ inputs.phase }}.${{ steps.get-version-number.outputs.version_number}}"
-            echo "release_version=${{ inputs.version }}-${{ inputs.phase }}.${{ steps.get-version-number.outputs.version_number}}" >> $GITHUB_OUTPUT
-          fi
-      - name: Check Release Version
+      - name: Check Release Version To Publish
         if: ${{ inputs.phase == 'release' }}
         run: |
           if git show-ref --tags --verify --quiet "refs/tags/${{ steps.get-version.outputs.release_version }}"; then
